@@ -1,6 +1,13 @@
-install.packages("")
 # Libraries ---------------------------------------------------------------
 
+pkgs <- c(
+  "tidyverse",
+  "data.table"
+)
+
+lapply(pkgs, library, character.only = TRUE)
+
+?lapply
 library(tidyverse)
 library(readxl)
 library(formattable)
@@ -12,13 +19,14 @@ library(afex)
 library(rstatix)
 library(egg)
 library(DescTools)
+library(data.table)
 
-# read --------------------------------------------------------------------
+# Import data -------------------------------------------------------------
+
 rm(list=ls())
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-setwd("D:\\Bibliotheken\\Dokumente\\R\\Projektseminar")
-
-data <- read_excel("D:\\Bibliotheken\\Dokumente\\R\\Projektseminar\\Projsem.data_Excel_cleaned.xlsx") #Excel übernimmt auch ü, ä, usw.
+data <- read_excel("D:\\Bibliotheken\\Dokumente\\R\\Projektseminar\\Projsem.data_Excel_cleaned.xlsx")
 
 head(data)
 

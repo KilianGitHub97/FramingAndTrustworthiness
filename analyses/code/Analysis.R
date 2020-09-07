@@ -1,15 +1,5 @@
 # Libraries ---------------------------------------------------------------
 
-pkgs <- c(
-  "tidyverse",
-  "data.table"
-)
-
-lapply(pkgs, library, character.only = TRUE)
-
-?lapply
-library(tidyverse)
-library(readxl)
 library(formattable)
 library(MASS)
 library(effsize)
@@ -19,182 +9,79 @@ library(afex)
 library(rstatix)
 library(egg)
 library(DescTools)
-library(data.table)
 
-# Import data -------------------------------------------------------------
+# Import ------------------------------------------------------------------
 
+#Libraries
+source("Packages.R")
+
+#setwd
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-data <- read_excel("D:\\Bibliotheken\\Dokumente\\R\\Projektseminar\\Projsem.data_Excel_cleaned.xlsx")
-
-head(data)
-
-# converting variables ----------------------------------------------------
-
-str(data) #check the data structure
-glimpse(data) #dplyr aproach to check data structure
-
-data$Gender <- as.factor(data$Gender)
-data$Condition <- as.factor(data$Condition)
-data$id <- as.numeric(data$Condition)
+#Load data
+data <- readRDS("..//..//data//processed//FramingAndTrust_clean.rds")
 
 
-# cleaning invalid responses ----------------------------------------------
+# Exploration -------------------------------------------------------------
 
-data <- data %>%
-  rename(Duration = `Duration (in seconds)`) %>%
-  filter(Duration < 3000) %>%
-  filter(Duration > 120) %>%
-  filter(Progress == 100) %>%
-  mutate(ConsentConfirm = recode(
-    ConsentConfirm,
-    "Ich habe die aufgeführten Bedingungen gelesen und verstanden. Mit der Auswahl dieser Antwort bestätige ich mein Einverständnis zur Teilnahme an dieser Studie." = 2,
-    "Nein, ich bin mit den Bedingungen nicht einverstanden oder habe mich aus anderen Gründen entschieden, nicht an der Studie teilzunehmen." = 1
-  )) %>%
-  mutate(id = recode(
-    id,
-    "2" = "Positive Frame",
-    "1" = "Negative Frame"
-  )) %>%
-  filter(ConsentConfirm == 2)
+#Duration
+summary(data$Duration)
+hist(data$Duration, breaks = 50)
 
-view(data) 
+#Date
+range(data$Date)
+table(
+  as.Date(
+    as.character(data$Date)
+  )
+)
+hist(data$Date, breaks = 50)
 
+#Gender
+table(factor(data$Gender))
+prop.table(table(factor(data$Gender)))
 
-# first look at the data --------------------------------------------------
+#Age
+summary(data$Age)
+hist(data$Age, breaks = 50)
 
-occurrence_gender <- count(data, Gender) 
-print(occurrence_gender) #23 male, 2 don't want to say, 77 female
+#Condition
+table(data$Condition)
+prop.table(table(data$Condition))
 
-occurrence_condition <- count(data, id) 
-print(occurrence_condition) # posFrame: 54, negFrame: 49
+# Balance check -----------------------------------------------------------
 
-summary(data$Age) # Min. 19 1st Qu.: 21  Median: 22    Mean 3rd Qu.: 22.72    Max.:47 
-barplot_age <- ggplot(data = data,
-                      mapping = aes(
-                           x = Age
-                         )) +
-                  geom_bar(aes(color = Gender)) + #adds the Genders in color to the barplot
-                  labs( #adds lables to the data
-                    title = "Age by Gender",
-                    subtitle = "From dataframe 'data'",
-                    caption = "This is a graphic that ilustrates the Age by Gender" #metadescription
-                    )         
-print (barplot_age) #Age distribution in a histogram
-#ggsave("AgeANDGender.jpeg") #save distribution to the setwd
-
-
-duplicated_rows <- data %>% duplicated()%>%
-                            table()
-print(duplicated_rows) #no duplicated rows
-
-data%>%
+#Age per Condition
+data %>%
+  group_by(Condition) %>%
   summarise(
-    Mean_age = mean(Age),
-    SD_age = sd(Age),
-    MAX_age = max(Age),
-    MIN_age = min(Age)
+    Mean = mean(Age),
+    Median = median(Age),
+    Range = range(Age)
   )
+wilcox.test(
+  x = data[Condition == "PositiveFrame"]$Age,
+  y = data[Condition == "NegativeFrame"]$Age,
+  paired = FALSE)
 
-#Means of all the Items
-ItemMeans <- tidy(
-  data %>% 
-    select(contains("Frame"))%>%
-    colMeans(na.rm = TRUE, dims = 1)
-  )
+#Gender per Condition
+chisq.test(
+  table(data$Condition, factor(data$Gender))
+)
 
-#Modes of all the Items
-CondVars <- data%>%
-  select(contains("Frame"))
-sapply(CondVars, Mode, na.rm = TRUE)
-
-
-
-
-# Check Demographics ------------------------------------------------------
-
-## dataframe for positive and negative ===================================
-
-negFrame_Data <- data%>%
-  filter(id == "Positive Frame")
-
-posFrame_Data <- data%>%
-  filter(id == "Negative Frame")
-
-#age======================================================================
-
-#summary
-data%>%
-  group_by(id)%>%
+#TrustInStranger per Condition
+data %>%
+  group_by(Condition) %>%
   summarise(
-    Mean_age = mean(Age),
-    SD_age = sd(Age),
-    MAX_age = max(Age),
-    MIN_age = min(Age)
+    Mean = mean(TrustInStranger),
+    Median = median(TrustInStranger),
+    Range = range(TrustInStranger)
   )
-
-#graphical
-Agedistribution <- ggplot(data = data,
-                          aes(
-                            x = data$Age
-                          ))+
-  geom_bar(aes(color = data$Gender)) +
-  facet_wrap(~id)
-
-#test for significant differences in the two conditions: Since there is no normal distribution shown, we have to use the Mann Whitney U Test that is calculated with the wilcox function
-wilcox.test(posFrame_Data$Age, negFrame_Data$Age, paired = FALSE) #there are no significant differences
-
-#check for outliers
-Outlier_box <- ggplot(data = data,
-                      aes(
-                        y = data$Age
-                      )) +
-  geom_boxplot() +
-  facet_wrap(~data$id)
-
-#Gender==================================================================
-
-#draw up a table with the frequency of the Gender by Condition
-tab_for_chisq<- table(data$id, data$Gender)
-
-#test for significant differences between the two Conditions
-chisq.test(tab_for_chisq) #no significant difference
-
-#graphical
-Gender_plot <- ggplot(data = data,
-                      aes(
-                        x = data$Gender
-                      )) +
-  geom_bar() +
-  facet_wrap(~data$id)
-
-#Trust in Stranger=======================================================
-
-#summary
-data%>%
-  group_by(id)%>%
-  summarise(
-    Mean_TIS = mean(TrustInStranger),
-    SD_TIS = sd(TrustInStranger),
-    MAX_TIS = max(TrustInStranger),
-    MIN_TIS = min(TrustInStranger)
-  )
-
-#graphical
-Agedistribution <- ggplot(data = data,
-                          aes(
-                            x = data$TrustInStranger
-                          ))+
-  geom_bar(aes(color = data$Gender)) +
-  facet_wrap(~id)
-
-#are these normally distributed?
-shapiro.test(posFrame_Data$TrustInStranger) #p-value = 0.006689 -> significant -> not normally distributed
-shapiro.test(negFrame_Data$TrustInStranger) #p-value = 0.003557 -> significant -> not normally distributed
-
-#therefore we use the Mann Whitney U Test
-wilcox.test(negFrame_Data$TrustInStranger, posFrame_Data$TrustInStranger, paired = FALSE) # there are no significant differences
+wilcox.test(
+  data[Condition == "PositiveFrame"]$TrustInStranger,
+  data[Condition == "NegativeFrame"]$TrustInStranger,
+  paired = FALSE)
 
 #Understanding of Experiment===============================================
 

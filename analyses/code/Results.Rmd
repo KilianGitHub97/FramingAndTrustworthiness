@@ -1,0 +1,20 @@
+---
+title: "Impact of Information Framing on Trustworthiness"
+author: "Kilian Sennrich"
+date: "7 9 2020"
+output: html_document
+    theme: united
+    toc: true
+    toc_float: true
+---
+```{r include=FALSE}
+source("Analysis.R")
+```
+
+## Descriptive Statistics and Exloration of the data
+
+```{r}
+
+```
+
+

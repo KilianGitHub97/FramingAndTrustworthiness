@@ -2,19 +2,86 @@
 title: "Impact of Information Framing on Trustworthiness"
 author: "Kilian Sennrich"
 date: "7 9 2020"
-output: html_document
+output:
+  html_document:
     theme: united
     toc: true
     toc_float: true
 ---
 ```{r include=FALSE}
-source("Analysis.R")
+#source("Analysis.R")
+library(data.table)
+library(tidyverse)
+data <- readRDS("..//..//data//processed//FramingAndTrust_clean.rds")
 ```
 
-## Descriptive Statistics and Exloration of the data
+# Exploration
 
-```{r}
+## Balance check
 
+For propper analysis, it is important, that demographic factors are well balanced between the two Conditions "Positive Frame" & "Negative Frame"
+
+**Age**
+
+```{r echo=FALSE}
+wilcox.test(
+  x = data[Condition == "PositiveFrame"]$Age,
+  y = data[Condition == "NegativeFrame"]$Age,
+  paired = FALSE)
 ```
+
+Mann Withney U Test was used to see, whether age distribution significantly differs between the two Conditions. This was not the case
+
+**Gender**
+
+```{r echo=FALSE}
+chisq.test(
+  table(data$Condition, factor(data$Gender))
+)
+```
+
+Chi-squared test was used to see, whether the Genders were equivalently represented between the two Conditions. This was the case.
+
+**Trust in Stranger**
+
+```{r echo=FALSE}
+wilcox.test(
+  data[Condition == "PositiveFrame"]$TrustInStranger,
+  data[Condition == "NegativeFrame"]$TrustInStranger,
+  paired = FALSE)
+```
+
+Mann Withney U Test was used to see, whether people in both conditions generally trust the same in stranger. This is the case here.
+
+## Understanding of the Experiment
+
+Understanding of the experiment was good. On Average 5.6 out of 7 Points were given by the subjects for the understanding of ones task and the understanding of the description. High correlation between the items is expected. In fact 72 of the 103 subjects (~70%) chose the same answer for both of the items.
+
+```{r echo=FALSE}
+rbind(
+  UnderDesc = summary(data$UnderDesc),
+  UnderRole = summary(data$UnderRole)
+)
+table(
+  UnderDesc = data$UnderDesc,
+  UnderRole = data$UnderRole
+)
+cor(
+  data$UnderDesc,
+  data$UnderRole,
+  method = "spearman"
+)
+```
+
+# Analysis
+
+## Correlation Table
+
+
+
+```{r echo=FALSE}
+cor_table
+```
+
 
 

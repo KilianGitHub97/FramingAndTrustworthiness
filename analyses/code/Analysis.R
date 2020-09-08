@@ -1,6 +1,5 @@
 # Libraries ---------------------------------------------------------------
 
-library(formattable)
 library(MASS)
 library(effsize)
 library(stats)
@@ -12,12 +11,12 @@ library(DescTools)
 
 # Import ------------------------------------------------------------------
 
-#Libraries
-source("Packages.R")
-
 #setwd
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+#Libraries
+source("Packages.R")
 
 #Load data
 data <- readRDS("..//..//data//processed//FramingAndTrust_clean.rds")
@@ -49,6 +48,22 @@ hist(data$Age, breaks = 50)
 #Condition
 table(data$Condition)
 prop.table(table(data$Condition))
+
+#Understanding of experiment
+rbind(
+  UnderDesc = summary(data$UnderDesc),
+  UnderRole = summary(data$UnderRole)
+)
+table(
+  UnderDesc = data$UnderDesc,
+  UnderRole = data$UnderRole
+)
+cor(
+  data$UnderDesc,
+  data$UnderRole,
+  method = "spearman"
+)
+
 
 # Balance check -----------------------------------------------------------
 
@@ -83,88 +98,63 @@ wilcox.test(
   data[Condition == "NegativeFrame"]$TrustInStranger,
   paired = FALSE)
 
-#Understanding of Experiment===============================================
 
-#Test wether people understand the experiment
-data%>%
-  summarise(
-    mean_understanding = mean(UnderDesc),
-    SD_understanding = sd(UnderDesc),
-    max_understanding = max(UnderDesc),
-    min_understanding = min(UnderDesc),
-  )  #Understanding of whats to do was good, considering that the possible inputs were between 1-7: mean = 5.56, sd = 1.32, max = 7, min = 2
+# Analysis ----------------------------------------------------------------
 
-data%>%
-  summarise(
-    mean_role = mean(UnderRole),
-    SD_role = sd(UnderRole),
-    max_role = max(UnderRole),
-    min_role = min(UnderRole),
-  ) #Understanding of whats to do was good, considering that the possible inputs were between 1-7: mean = 5.62, sd = 1.29, max = 7, min = 2
+#Correlation Table
+infos <- c("PastGame", "Promise", "PersTrait")
+measures <- c("Trust", "Conf", "Transfer")
+conditions <- c("_PosFrame", "_NegFrame")
+cor_table <- list()
+l = 1
 
-Correlation_EvaluativeTasks<- cor(data$UnderDesc, data$UnderRole, method = "pearson") #cor = 0.8 suggests that people did not understand the difference in the two items.
-
-#Parallel coordinates plot
-ColorParcoord <- ifelse(data$UnderRole <= data$UnderDesc,"green","red") #Vector color
-parcoord(data[,c("UnderRole","UnderDesc")], var.label = TRUE, col = ColorParcoord) #parallel coordinates Diagramm suggests, that most of the people recorded the same value
-
-#see how many people gave the same input to UnderRole and UnderDesc
-data%>% 
-  filter(UnderDesc == UnderRole)%>%
-  count() #71 of 102 responses did not differ between UnderDesc and UnderRole
-
-#conclusion: The overall understanding of the Experiment was ok, but people did not understand, that the two items did not ask the same thing =D
-
-
-
-
-
-
-# correlation tables for positive and negative correlation ----------------
-
-select <- dplyr::select #bc Mass uses select too. So we have to say, that we want select to be from dplyr
-
-DrawCorTable <- function(data, x, y){
-  #Select all the columns that contain "x"
-  corvar1 <- data %>% 
-    select(contains(x)) %>%
-    na.omit()
-  
-  #Select all the columns that contain "y"
-  corvar2 <- data%>% 
-    select(contains(y)) %>%
-    na.omit()
-  
-  #draw a correlation matrix
-  PosWideAllCorrelation <- as.data.frame(cor(x = corvar1, y = corvar2, method = "pearson"))%>% 
-    rownames_to_column() #since a matrix contains separate rownames, we have to put them inside a column
-  
-  #the correlation df is in wide format, what makes it difficult to understand. We have to make it "long"
-  PosLongAllCorellation <- gather(data = PosWideAllCorrelation, Second_Item, Correlation, -rowname) 
- 
-  #now we have a dataframe, that contains the correlation between every single variable from corvar 1 & corvar 2, which is not useful. Therefore we filter out the unnecessary ones  
-  PoscountRowame <- nchar(PosLongAllCorellation$rowname, type = "chars") #the idea is, that the corresponding variables contain the same amount of characters. Therefore we can count the characters and compare them afterwards
-  PoscountSecondCond <- nchar(PosLongAllCorellation$Second_Item, type = "chars")
-  
-  CorTable <- PosLongAllCorellation %>%
-    filter(PoscountRowame == PoscountSecondCond)%>% #compare the number of characters of the two corresponding variables.
-    filter(grepl("Trust", rowname) == grepl("Trust", Second_Item))%>%#Some variables don't match the system, so we have to adjust
-    rename(First_Item = "rowname") #Rename for style
+for (info in 1:3) {
+  for (mes in 1:3) {
+    for (cond in 1:2) {
+      
+      #set up variables
+      var_one <- paste0(
+        "data$",
+        infos[info],
+        "1",
+        conditions[cond],
+        measures[mes]
+      )
+      var_two <- paste0(
+        "data$",
+        infos[info],
+        "2",
+        conditions[cond],
+        measures[mes]
+      )
+      
+      #Correlation & Results
+      cor <- cor.test(
+        eval(parse(text = var_one)),
+        eval(parse(text = var_two)),
+        method = "spearman"
+        )
+      cor_table[[l]] <- data.table(
+        name = paste(
+          infos[info],
+          conditions[cond],
+          measures[mes],
+          sep = "_"),
+        correlation = round(
+          cor$estimate,
+          4),
+        p.value = round(
+          cor$p.value,
+          4)
+        )
+      
+      l = l + 1
+    }
+  }
 }
 
-#making a correlation table with all corresponding items of the positive frame
-CorTablePos <- DrawCorTable(data = data,x = "1_PosFrame", y = "2_PosFrame") 
-PosRangeOfCorrelation <- range(CorTablePos$Correlation) #Range
-formattable(CorTablePos)
-
-#making a correlation table with all corresponding items of the negative frame
-CorTableNeg <- DrawCorTable(data = data, x = "1_NegFrame", y = "2_NegFrame") 
-NegRangeOfCorrelation <- range(CorTableNeg$Correlation) #Range
-formattable(CorTableNeg)
-
-
-
-
+cor_table <- rbindlist(cor_table)
+#Goal: Try without parse
 
 # Item combined dataframe -------------------------------------------------
 

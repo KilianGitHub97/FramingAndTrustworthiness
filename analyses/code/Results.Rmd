@@ -87,7 +87,7 @@ cor_table
 
 Range and dotplot
 
-```{r}
+```{r echo=FALSE}
 range(
   cor_table[grep("Pos", name)]$correlation
 )
@@ -100,7 +100,7 @@ plot(
 
 Range and dotplot
 
-```{r}
+```{r echo=FALSE}
 range(
   cor_table[grep("Pos", name)]$correlation
 )
@@ -108,6 +108,63 @@ plot(
   cor_table[grep("Pos", name)]$correlation
 )
 ```
+
+## First Look at Data
+
+Boxplots can be a great way to get an overview over the data. Black line indicates Median, blue boxes indicate interquartiles, whiskers indicate values outside the box and points indicate outliers. Trust and Confidence Items are rated on a Likert 1-7 scale, whereas Transfer Items are rated on a Likert 0-10 scale. 
+
+**All Items**
+
+The following graph includes boxplots from all Items of the experiment. The following characteristics can be identified:
+
+1. Transfer items are usually higher than Trust and Confidence Items. This can be explained by the different scales used concerning the items. 
+2. Items from the negative frame tend to have more variance between the medians of the items. 
+3. Medians in the positive frame are usually higher than the center of the scale. Medians in negative frame are lower than the center of the scale.
+4. In the negative frame, the past game differs from the personality trait item and the promise item. This might be an indication for improper item formulation.
+5. In most of the items, there are some outliers.
+
+
+```{r echo=FALSE}
+BoxAll
+```
+
+**Trust Items**
+
+Trust items were rated on a Likert 1-7 scale. The following characteristics can be identified:
+
+1. In the positive frame, the promise item seems the least trustworthy. This was to be expected from the previous literature.
+2. In the negative frame, the personality trait item was the least trustworthy. This was not to be expected from previous literature.
+3. The personality trait item differs the most between positive and negative frame. Limitations: This could be due to incorrect wording.
+4. Framing does not seem to have too much impact on the perception of the trustworthiness of a person. No big differences can be found between past game items in both frames. The same applies to the promise item. The personality trait item differs between the frames, but this could be rather be due to misleading item formulation. 
+
+```{r echo=FALSE}
+BoxTrust
+```
+
+**Confidence Items**
+
+Condidence items were rated on a Likert 1-7 scale. The following characteristics can be identified:
+
+1. The confidence in ones decision to invest money in someone seems to be quite stable over the different items. 
+2. Framing does not seem to have an impact on confidence.
+3. The confidence in promise items might be slightly lower than in the others.
+
+```{r echo=FALSE}
+BoxConf
+```
+
+**Transfer Items**
+
+Transfer items were rated on a Likert 0-10 scale. The following characteristics can be identified:
+
+1. Most of the medians lie between an investment of 5.0 Fr. and 7.5 Fr. This does not apply to the personality trait item in the negative frame. Possible reason is incorrect wording
+2. Medians of the positive frame and the negative frame were quite similar (except in the personality trait item). This means, that framing does not have an impact on the amount invested.
+3. Money transfer is item dependent. People tend to invest the least amount on the promise item, more on the personality trait item and the most on the past game item.
+
+```{r echo=FALSE}
+BoxTransfer
+```
+
 
 
 

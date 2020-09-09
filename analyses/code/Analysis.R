@@ -303,6 +303,70 @@ data <- data %>%
 # Goal: shorten code
 
 
+# Graphs ------------------------------------------------------------------
+
+#Preparation: Long format
+data_long <- melt(
+  data = data,
+  measure.vars = grep("Frame", colnames(data)),
+  na.rm = TRUE
+)
+
+#Boxplot with all Items
+BoxAll <- ggplot(
+  data = data_long,
+  mapping = aes(
+    x = variable,
+    y = value
+  )) +
+  geom_boxplot(fill = "lightblue") +
+  ylab("likert") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, size = 8)
+  )
+
+# Boxplot for Trust Items
+BoxTrust <- ggplot(
+    data = data_long[grep("Trust", variable)],
+    mapping = aes(
+      x = variable,
+      y = value
+    )) +
+    geom_boxplot(fill = "lightblue") +
+    ylab("likert") +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 90, size = 8)
+      )
+
+#Boxplot for Confidence Items
+BoxConf <- ggplot(
+  data = data_long[grep("Conf", variable)],
+  mapping = aes(
+    x = variable,
+    y = value
+  )) +
+  geom_boxplot(fill = "lightblue") +
+  ylab("likert") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, size = 8)
+  )
+
+#Boxplot for Transfer Items
+BoxTransfer <- ggplot(
+  data = data_long[grep("Transfer", variable)],
+  mapping = aes(
+    x = variable,
+    y = value
+  )) +
+  geom_boxplot(fill = "lightblue") +
+  ylab("likert") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, size = 8)
+  )
 
 # testing Hypothesis ------------------------------------------------------
 

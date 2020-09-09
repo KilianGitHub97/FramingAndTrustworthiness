@@ -156,94 +156,151 @@ for (info in 1:3) {
 cor_table <- rbindlist(cor_table)
 #Goal: Try without parse
 
-# Item combined dataframe -------------------------------------------------
+#analysis cor_table
+range(
+  cor_table[grep("Pos", name)]$correlation
+)
+plot(
+  cor_table[grep("Pos", name)]$correlation
+)
+range(
+  cor_table[grep("Neg", name)]$correlation
+)
+plot(
+  cor_table[grep("Neg", name)]$correlation
+)
 
-#function, that adds columns together
-AddValues <- function(data, x, y){ 
-  TabX <- data%>%
-    select(Duration,
-           UsefulPastBehav,
-           UsefulPersTrait,
-           UsefulPersMess,
-           UnderDesc,
-           UnderRole,
-           Gender,
-           id,
-           contains(x))%>%
-    na.omit()
-    
-  TabY <- data%>%
-    select(Duration,
-           UsefulPastBehav,
-           UsefulPersTrait,
-           UsefulPersMess,
-           UnderDesc,
-           UnderRole,
-           Gender,
-           id,
-           contains(y))%>%
-    na.omit()
-    
-  names(TabX) <- names(TabY)
-  
-  CombinedData <- rbind(TabX, TabY)
-}
-
-#inserting the pattern from columns of the positive condition, that have to be combined
-AddedValuesPosFrame <- AddValues(data = data, x = "2_Pos", y = "1_Pos")
-
-#inserting the pattern from columns of the negative condition, that have to be combined
-AddedValuesNegFrame <- AddValues(data = data, x = "2_Neg", y = "1_Neg")
-
-#put the two frames together.
-AddedValuesFull <- full_join(AddedValuesPosFrame, AddedValuesNegFrame, by = c("Duration", 
-                                                                              "UsefulPastBehav",
-                                                                              "UsefulPersTrait",
-                                                                              "UsefulPersMess",
-                                                                              "UnderDesc",
-                                                                              "UnderRole",
-                                                                              "Gender",
-                                                                              "id"))%>%
-  arrange(desc(id))
-
-view(AddedValuesFull) #dataframe with all the combinded items
-
-
-# transform from wide to long ---------------------------------------------
-select <- dplyr::select()
-
-AddedValuesFull.long <- gather(data = AddedValuesFull, key = "Condition", value = "Likert",  -Duration, 
-                                                                                             -UsefulPastBehav,
-                                                                                             -UsefulPersTrait,
-                                                                                             -UsefulPersMess,
-                                                                                             -UnderDesc,
-                                                                                             -UnderRole,
-                                                                                             -Gender,
-                                                                                             -id)
-
-#select only transfer items
-AddedValuesFull.long.Transfer <- AddedValuesFull.long %>% 
-  filter(grepl("Transfer", AddedValuesFull.long$Condition)) %>%
-  na.omit()
-
-#Barplot that shows the means of all variables with "Transfer
-BarMeanTransfer <- ggplot(data = AddedValuesFull.long.Transfer,  
-       mapping = aes(
-         x = Condition,
-         y = Likert,
-         fill = id
-       )) +
-  geom_bar(stat = "summary", fun.y = "mean")
-
-#Boxplot that shows the means of all variables with "Transfer
-BoxMeanTransfer <- ggplot(data = AddedValuesFull.long.Transfer,  
-                          mapping = aes(
-                            x = Condition,
-                            y = Likert,
-                            fill = id
-                          )) +
-  geom_boxplot()
-
+#Item combination
+data <- data %>%
+  mutate(
+    PastGame_PosFrame_Trust = 
+      round(
+        (PastGame1_PosFrameTrust +
+        PastGame2_PosFrameTrust) /
+          2,
+        0)) %>%
+  mutate(
+    PastGame_PosFrame_Conf = 
+      round(
+        (PastGame1_PosFrameConf +
+        PastGame2_PosFrameConf) /
+          2,
+        0)) %>% 
+  mutate(
+    PastGame_PosFrame_Transfer = 
+      round(
+        (PastGame1_PosFrameTransfer +
+        PastGame2_PosFrameTransfer) /
+          2,
+        0)) %>%
+  mutate(
+    PersTrait_PosFrame_Trust = 
+      round(
+        (PersTrait1_PosFrameTrust +
+        PersTrait2_PosFrameTrust) /
+          2,
+        0)) %>%
+  mutate(
+    PersTrait_PosFrame_Conf = 
+      round(
+        (PersTrait1_PosFrameConf +
+        PersTrait2_PosFrameConf) /
+          2,
+        0)) %>%
+  mutate(
+    PersTrait_PosFrame_Transfer = 
+      round(
+        (PersTrait1_PosFrameTransfer +
+        PersTrait2_PosFrameTransfer) /
+          2,
+        0)) %>%
+  mutate(
+    Promise_PosFrame_Trust = 
+      round(
+        (Promise1_PosFrameTrust +
+        Promise2_PosFrameTrust) /
+          2,
+        0)) %>%
+  mutate(
+    Promise_PosFrame_Conf = 
+      round(
+        (Promise1_PosFrameConf +
+        Promise2_PosFrameConf) /
+          2,
+        0)) %>%
+  mutate(
+    Promise_PosFrame_Transfer = 
+      round(
+        (Promise1_PosFrameTransfer +
+        Promise2_PosFrameTransfer) /
+          2,
+        0)) %>%
+  mutate(
+    PastGame_NegFrame_Trust = 
+      round(
+        (PastGame1_NegFrameTrust +
+        PastGame2_NegFrameTrust) /
+          2,
+        0)) %>%
+  mutate(
+    PastGame_NegFrame_Conf = 
+      round(
+        (PastGame1_NegFrameConf +
+        PastGame2_NegFrameConf) /
+          2,
+        0)) %>%
+  mutate(
+    PastGame_NegFrame_Transfer = 
+      round(
+        (PastGame1_NegFrameTransfer +
+        PastGame2_NegFrameTransfer) /
+          2,
+        0)) %>%
+  mutate(
+    PersTrait_NegFrame_Trust = 
+      round(
+        (PersTrait1_NegFrameTrust +
+        PersTrait2_NegFrameTrust) /
+          2,
+        0)) %>%
+  mutate(
+    PersTrait_NegFrame_Conf = 
+      round(
+        (PersTrait1_NegFrameConf +
+        PersTrait2_NegFrameConf) /
+          2,
+        0)) %>%
+  mutate(
+    PersTrait_NegFrame_Transfer = 
+      round(
+        (PersTrait1_NegFrameTransfer +
+        PersTrait2_NegFrameTransfer) /
+          2,
+        0)) %>%
+  mutate(
+    Promise_NegFrame_Trust = 
+      round(
+        (Promise1_NegFrameTrust +
+        Promise2_NegFrameTrust) /
+          2,
+        0)) %>%
+  mutate(
+    Promise_NegFrame_Conf = 
+      round(
+        (Promise1_NegFrameConf +
+        Promise2_NegFrameConf) /
+          2,
+        0)) %>%
+  mutate(
+    Promise_NegFrame_Transfer = 
+      round(
+        (Promise1_NegFrameTransfer +
+        Promise2_NegFrameTransfer) /
+          2,
+        0)) %>%
+  select(-contains("1_")) %>%
+  select(-contains("2_"))
+# Goal: shorten code
 
 
 

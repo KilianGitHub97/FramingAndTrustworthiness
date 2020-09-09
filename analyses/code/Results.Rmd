@@ -77,10 +77,36 @@ cor(
 
 ## Correlation Table
 
-
+Item titles are systematic. Numbers 1 or 2 indicate measurement repetition. Repeated items are considered to correlate. Magnitude of correlation can be used as an indication of the reliability of item formulation. In the following, a correlation table can be found, which includes p.value and correlation. The reliability of the different items is not uniform. A correlation of just under 0.5 can be rated as very low, whereas a correlation of 0.8 seems definitely sufficient. For further analysis, repeated measurements will be combined (rounded mean).
 
 ```{r echo=FALSE}
 cor_table
+```
+
+**Condition: Positive Frame**
+
+Range and dotplot
+
+```{r}
+range(
+  cor_table[grep("Pos", name)]$correlation
+)
+plot(
+  cor_table[grep("Pos", name)]$correlation
+)
+```
+
+**Condition: Negative Frame**
+
+Range and dotplot
+
+```{r}
+range(
+  cor_table[grep("Pos", name)]$correlation
+)
+plot(
+  cor_table[grep("Pos", name)]$correlation
+)
 ```
 
 

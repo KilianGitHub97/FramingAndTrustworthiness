@@ -368,6 +368,39 @@ BoxTransfer <- ggplot(
     axis.text.x = element_text(angle = 90, size = 8)
   )
 
+#correlation network: positive frame
+range(data[, grep("Pos", colnames(data))])
+CorMatPos <- cor(
+  data[, 13:21],
+  method = "spearman",
+  use = "complete.obs"
+)
+QgraphPos <- qgraph(
+  CorMatPos,
+  graph = "pcor",
+  layout = "spring",
+  label.prop = 2
+)
+
+#correlation network: positive frame
+range(data[, grep("Neg", colnames(data))])
+CorMatNeg <- cor(
+  data[, 22:30],
+  method = "spearman",
+  use = "complete.obs"
+)
+QgraphNeg <- qgraph(
+  CorMatNeg,
+  graph = "pcor",
+  layout = "spring",
+  label.prop = 2
+)
+
+
+# Hypothesis --------------------------------------------------------------
+
+
+
 # testing Hypothesis ------------------------------------------------------
 
 # Hypothesis 1 ============================================================

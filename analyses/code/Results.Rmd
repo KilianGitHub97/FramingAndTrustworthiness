@@ -165,6 +165,32 @@ Transfer items were rated on a Likert 0-10 scale. The following characteristics 
 BoxTransfer
 ```
 
+**Correlation Table**
 
+Correlation Networks are a great way to visualize connections between items. However, they can only be interpreted by considering the corresponding correlation matrix. 
+
+Correlation matrix for positive frame:
+
+```{r echo=FALSE}
+CorMatPos
+QgraphPos
+```
+
+Item description:
+
+* PG & PstGm = Past Game; PT & PrsTrt = Personality Trait; P & Prms = Promise
+* C = Confidence; Trn = Transfer; Trs = Trust
+
+Correlation matrix for negative frame:
+
+```{r echo=FALSE}
+CorMatNeg
+QgraphNeg
+```
+
+Item description:
+
+* PG & PstGm = Past Game; PT & PrsTrt = Personality trait; P & Prms = Promise
+* C = Confidence; Trn = Transfer; Trs = Trust
 
 

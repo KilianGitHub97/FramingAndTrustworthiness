@@ -193,4 +193,16 @@ Item description:
 * PG & PstGm = Past Game; PT & PrsTrt = Personality trait; P & Prms = Promise
 * C = Confidence; Trn = Transfer; Trs = Trust
 
+## Hypothesis Testing
+
+### Did Framing work?
+
+In the following, a table is presented, that shows the p-values of the statistical difference between the positive and negative frames. p.adjust column further includes the bonferroni adjusted p.values. It is often used to correct for alpha inflation. From the table it can be interpreted, that framing did not work in our experiment. Only the personality trait items show significant differences, but as seen above, it is most likely due to poor item formulation in the negative frame. 
+
+```{r echo=FALSE}
+FramingTest
+```
+
+
+
 

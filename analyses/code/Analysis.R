@@ -396,45 +396,56 @@ QgraphNeg <- qgraph(
   label.prop = 2
 )
 
-
 # Hypothesis --------------------------------------------------------------
 
+# 1. Items from the positive frame rank significantly better (higher likert
+# score) than their direct correspondent from the negative frame. 
+
+#Note: infos, conditions and measures are defined on lines 105-107
+
+FramingTest <- list()
+l = 1
+
+for(i in 1:3){
+  for (j in 1:3) {
+    var_one <- paste0(
+      "data$",
+      infos[i],
+      conditions[1],
+      "_",
+      measures[j]
+    )
+    var_two <- paste0(
+      "data$",
+      infos[i],
+      conditions[2],
+      "_",
+      measures[j]
+    )
+    WilcoxTest <- wilcox.test(
+      na.omit(eval(parse(text = var_one))),
+      na.omit(eval(parse(text = var_two))),
+      paired = FALSE
+    )
+    Effsize <- cohen.d(
+      eval(parse(text = var_one)),
+      eval(parse(text = var_two))
+    )
+    FramingTest[[l]] <- data.table(
+      var1 = var_one,
+      var2 = var_two,
+      w.stat = round(WilcoxTest$statistic, 4),
+      p.value = round(WilcoxTest$p.value, 4),
+      cohen.d = Effsize$estimate
+      )
+    l = l + 1
+  }
+}
+FramingTest <- rbindlist(FramingTest)
+FramingTest$p.adjust <- p.adjust(FramingTest$p.value)
 
 
-# testing Hypothesis ------------------------------------------------------
 
-# Hypothesis 1 ============================================================
-
-#filtering all the rows of our gathered dataframe that include "Trust"
-AddedValuesFull.long.Trust <- AddedValuesFull.long %>%
-  filter(grepl("Trust", AddedValuesFull.long$Condition)) %>%
-  na.omit()
-
-#calculate Range
-AddedValuesFull.long.Trust.Range <- range(AddedValuesFull.long.Trust$Likert)
-
-#visually check the distribution of the trustcondition -> not normally distributed
-DistCheckTrust.Bar <- ggplot(data = AddedValuesFull.long.Trust, 
-       aes(
-         x = Likert,
-         fill = id
-       )) +
-  geom_bar()+
-  facet_wrap(~Condition)
-
-#visually check the differences between the Frames using a Boxplot
-DistCheckTrust.Box <- ggplot(data = AddedValuesFull.long.Trust, 
-                         aes(
-                           x = Condition,
-                           y = Likert,
-                           fill = id
-                            )) +
-  geom_boxplot()
-
-#Mann Whitney U Test: Checking the significant differences between the Positive and the Negative Frames of "Trust"
-PastGameTrust.p <- wilcox.test(AddedValuesFull$PastGame1_PosFrameTrust, AddedValuesFull$PastGame1_NegFrameTrust, paired = FALSE) #p-value = 0.2496 
-PersTraitTrust.p <- wilcox.test(AddedValuesFull$PersTrait1_PosFrameTrust, AddedValuesFull$PersTrait1_NegFrameTrust, paired = FALSE) #p-value < 2.2e-16
-PromiseTrust.p <- wilcox.test(AddedValuesFull$Promise1_PosFrameTrust, AddedValuesFull$Promise1_NegFrameTrust, paired = FALSE) #p-value = 0.4403
 
 #Summarise Mean and SD
 PastGameTrust.summary <- AddedValuesFull %>%

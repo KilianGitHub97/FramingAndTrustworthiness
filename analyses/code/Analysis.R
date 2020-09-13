@@ -427,16 +427,11 @@ for(i in 1:3){
       na.omit(eval(parse(text = var_two))),
       paired = FALSE
     )
-    Effsize <- cohen.d(
-      eval(parse(text = var_one)),
-      eval(parse(text = var_two))
-    )
     FramingTest[[l]] <- data.table(
       var1 = var_one,
       var2 = var_two,
       w.stat = round(WilcoxTest$statistic, 4),
-      p.value = round(WilcoxTest$p.value, 4),
-      cohen.d = Effsize$estimate
+      p.value = round(WilcoxTest$p.value, 4)
       )
     l = l + 1
   }
@@ -444,110 +439,80 @@ for(i in 1:3){
 FramingTest <- rbindlist(FramingTest)
 FramingTest$p.adjust <- p.adjust(FramingTest$p.value)
 
+# 2. Perceived usefullness of the of different message types rank in the
+# following order: PastBehav, PersTrait, PersMess. 
 
-
-
-#Summarise Mean and SD
-PastGameTrust.summary <- AddedValuesFull %>%
-  summarise( #PastGame
-    MeanPastGamePos = mean(PastGame1_PosFrameTrust, na.rm = TRUE),
-    MeanPastGameNeg = mean(PastGame1_NegFrameTrust, na.rm = TRUE),
-    SDPastGamePos = sd(PastGame1_PosFrameTrust, na.rm = TRUE),
-    SDPastGameNeg = sd(PastGame1_NegFrameTrust, na.rm = TRUE),
-    MinPastGamePos = min(PastGame1_PosFrameTrust, na.rm = TRUE),
-    MinPastGameNeg = min(PastGame1_NegFrameTrust, na.rm = TRUE),
-    MaxPastGamePos = max(PastGame1_PosFrameTrust, na.rm = TRUE),
-    MaxPastGameNeg = max(PastGame1_NegFrameTrust, na.rm = TRUE)
+#shaping data
+data_friedman_wide <- data %>%
+  transmute(
+    id,
+    Condition,
+    UsefulPastBehav,
+    UsefulPersMess,
+    UsefulPersTrait
   )
-PersTraitTrust.summary <- AddedValuesFull %>%
-  summarise(
-    MeanPersTraitPos = mean(PersTrait1_PosFrameTrust, na.rm = TRUE),
-    MeanPersTraitNeg = mean(PersTrait1_NegFrameTrust, na.rm = TRUE),
-    SDPersTraitPos = sd(PersTrait1_PosFrameTrust, na.rm = TRUE),
-    SDPersTraitNeg = sd(PersTrait1_NegFrameTrust, na.rm = TRUE),
-    MinPersTraitPos = min(PersTrait1_PosFrameTrust, na.rm = TRUE),
-    MinPersTraitNeg = min(PersTrait1_NegFrameTrust, na.rm = TRUE),
-    MaxPersTraitPos = max(PersTrait1_PosFrameTrust, na.rm = TRUE),
-    MaxPersTraitNeg = max(PersTrait1_NegFrameTrust, na.rm = TRUE)
-  )
-PromiseTrust.summary <- AddedValuesFull %>%  
-  summarise(
-    MeanPromisePos = mean(Promise1_PosFrameTrust, na.rm = TRUE),
-    MeanPromiseNeg = mean(Promise1_NegFrameTrust, na.rm = TRUE),
-    SDPromisePos = sd(Promise1_PosFrameTrust, na.rm = TRUE),
-    SDPromiseNeg = sd(Promise1_NegFrameTrust, na.rm = TRUE),
-    MinPromisePos = min(Promise1_PosFrameTrust, na.rm = TRUE),
-    MinPromiseNeg = min(Promise1_NegFrameTrust, na.rm = TRUE),
-    MaxPromisePos = max(Promise1_PosFrameTrust, na.rm = TRUE),
-    MaxPromiseNeg = max(Promise1_NegFrameTrust, na.rm = TRUE)
+data_friedman_long <- melt(
+    data = data_friedman_wide,
+    measure.vars = grep("Useful", colnames(data_friedman_wide)),
+    na.rm = TRUE
   )
 
-H1.summary <- data.frame(cbind(c(PastGameTrust.summary, PersTraitTrust.summary, PromiseTrust.summary))) #Dataframe with all the summary info
+#descriptive stats and tests
+SummaryFriedman <- rbind(
+  PosFrame_PastBehav = summary(
+    data_friedman_wide[Condition == "PositiveFrame"]$UsefulPastBehav
+    ),
+  PosFrame_PersTrait = summary(
+    data_friedman_wide[Condition == "PositiveFrame"]$UsefulPersTrait
+    ),
+  PosFrame_PersMess = summary(
+    data_friedman_wide[Condition == "PositiveFrame"]$UsefulPersMess
+    ),
+  NegFrame_PastBehav = summary(
+    data_friedman_wide[Condition == "NegativeFrame"]$UsefulPastBehav
+  ),
+  NegFrame_PersTrait = summary(
+    data_friedman_wide[Condition == "NegativeFrame"]$UsefulPersTrait
+  ),
+  NegFrame_PersMess = summary(
+    data_friedman_wide[Condition == "NegativeFrame"]$UsefulPersMess
+  )
+)
+wilcox.test(
+  data_friedman_wide[Condition == "PositiveFrame"]$UsefulPastBehav,
+  data_friedman_wide[Condition == "NegativeFrame"]$UsefulPastBehav,
+  paired = FALSE
+)
+wilcox.test(
+  data_friedman_wide[Condition == "PositiveFrame"]$UsefulPersTrait,
+  data_friedman_wide[Condition == "NegativeFrame"]$UsefulPersTrait,
+  paired = FALSE
+)
+wilcox.test(
+  data_friedman_wide[Condition == "PositiveFrame"]$UsefulPersMess,
+  data_friedman_wide[Condition == "NegativeFrame"]$UsefulPersMess,
+  paired = FALSE
+)
 
-#Effectsize
-PastGameTrust.d <- cohen.d(AddedValuesFull$PastGame1_PosFrameTrust, AddedValuesFull$PastGame1_NegFrameTrust, na.rm = TRUE) #d estimate: 0.2172247 (small)
-PersTraitTrust.d <- cohen.d(AddedValuesFull$PersTrait1_PosFrameTrust, AddedValuesFull$PersTrait1_NegFrameTrust, na.rm = TRUE) # d estimate: 1.55833 (large)  
-PromiseTrust.d <-  cohen.d(AddedValuesFull$Promise1_PosFrameTrust, AddedValuesFull$Promise1_NegFrameTrust, na.rm = TRUE) #d estimate: -0.1069272 (negligible)
+#friedman and posthoc
+ResFriedman <- friedman.test(
+  y = data_friedman_long$value,
+  groups = data_friedman_long$variable,
+  blocks = data_friedman_long$id
+)
+PosthocFriedman <- rstatix::wilcox_test(
+  data = data_friedman_long,
+  formula = value ~ variable,
+  p.adjust.method = "bonferroni",
+  paired = TRUE
+)
 
+# 3. Confidence in an investment positively correlates
+# with the perceived usefulness of the corresponding 
+# information type
 
+# Use Trust
 
-
-#Hypothesis 2================================================================
-
-#overall: checking wether the tree groups differenciate 
-Hyp2data.wide <- data%>%
-  transmute(id, ResponseId, UsefulPastBehav, UsefulPersTrait, UsefulPersMess)
- 
-Hyp2data.long <- Hyp2data.wide %>%
-  gather(key = "Usefulness", value = "Likert", -id, -ResponseId)%>%
-  na.omit()
-
-#Boxplot that shows the differences of the Usefulness between the information types
-Hyp2Box <- ggplot(data = Hyp2data.long, #Boxplot for the usefulness of the information
-                  aes(
-                    x= Usefulness,
-                    y = Likert
-                  )) +
-  geom_barplot() +
-  facet_wrap(~id)
-
-
-#test wether there are significant differences between the 3 groups: why friedman.test(): bc. the usefulness was collected by all participants and therefore is a within subject design (with paired = TRUE). therefore we have to do an anova with paired = True. But the scale is ordinal so--> friedman.test
-friedman.test(y = Hyp2data.long$Likert, groups = Hyp2data.long$Usefulness, blocks = Hyp2data.long$ResponseId) #Friedman Test (bc: non-normal distributed input and within subject)
-
-#PostHoc test for friedman:  
-wilcox_test(data = Hyp2data.long,formula = Likert ~ Usefulness, p.adjust.method = "bonferroni", paired = TRUE) #package rstatix
-
-
-# for Positive and Negative Frame
-#function that caluculates the friedmantest and post hoc test
-H2.Test <- function(x){
-  Hyp2data.wide <- data%>%
-    transmute(id, ResponseId, UsefulPastBehav, UsefulPersTrait, UsefulPersMess) %>%
-    filter(id == x)
-  
-  Hyp2data.long <- Hyp2data.wide %>%
-    gather(key = "Usefulness", value = "Likert", -id, -ResponseId)%>%
-    na.omit()
-  
-  #test wether there are significant differences between the 3 groups
-  Res1 <- friedman.test(y = Hyp2data.long$Likert, groups = Hyp2data.long$Usefulness, blocks = Hyp2data.long$ResponseId)
-  
-  #PostHoc test: Tukey HSD
-  Res2 <- wilcox_test(data = Hyp2data.long, formula = Likert ~ Usefulness, p.adjust.method = "bonferroni", paired = TRUE) #package rstatix
-
-  print(Res1)
-  print(Res2)
-}
-
-#ANOVA and POSTHOC for Positive Frame
-H2.Test(x = "Positive Frame")
-#ANOVA and POSTHOC for Negative Frame
-H2.Test(x = "Negative Frame")
-
-
-
-#Hypothesis 3============================================
 #Table for positive Frame
 Tab.Pos.Frame <- AddedValuesFull %>%
   filter(id == "Positive Frame")

@@ -203,6 +203,19 @@ In the following, a table is presented, that shows the p-values of the statistic
 FramingTest
 ```
 
+### How did subjects rate the different information types?
 
+Different types of information are considered to be perceived differently by subjects. This has never been further investigated in past research making this an exploratory hypothesis. It is being expected that past experience is perceived the most useful followed by information on personality trait and then the promised message (PersMess). Nonparametric friedman test is performed on the ordinal data at hand. It is followed by bonferroni corrected paired wilcox post-hoc tests. In advance it was checked whether there are significant differences between positive and negative condition, which was not the case. Therefore friedman test was calculated over both conditions together. The three items do in fact differ significantly:
+
+```{r echo=FALSE}
+ResFriedman
+```
+
+The following post-hoc test showed that the hypothesis could only be confirmed partially. Information on a personal message was perceived significantly less useful than information on the past behavior and information on the personality trait. Individual means and medians can be found in the following table:
+
+```{r echo=FALSE}
+SummaryFriedman
+PosthocFriedman
+```
 
 

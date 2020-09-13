@@ -2,6 +2,6 @@ pkgs <- c(
   "tidyverse",
   "data.table",
   "qgraph",
-  "effsize"
+  "rstatix"
 )
 lapply(pkgs, library, character.only = TRUE)

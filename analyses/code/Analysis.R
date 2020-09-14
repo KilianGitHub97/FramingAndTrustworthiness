@@ -439,7 +439,7 @@ for(i in 1:3){
 FramingTest <- rbindlist(FramingTest)
 FramingTest$p.adjust <- p.adjust(FramingTest$p.value)
 
-# 2. Perceived usefullness of the of different message types rank in the
+# 2. Perceived usefulness of the of different message types rank in the
 # following order: PastBehav, PersTrait, PersMess. 
 
 #shaping data
@@ -510,6 +510,48 @@ PosthocFriedman <- rstatix::wilcox_test(
 # 3. Confidence in an investment positively correlates
 # with the perceived usefulness of the corresponding 
 # information type
+
+#descriptive stats and tests
+SummaryCortest <- rbind(
+  PastGame_PosFrame_Trust = summary(
+    data$PastGame_PosFrame_Trust
+  ),
+  PersTrait_PosFrame_Trust = summary(
+    data$PersTrait_PosFrame_Trust
+  ),
+  Promise_PosFrame_Conf = summary(
+    data$Promise_PosFrame_Conf
+  ),
+  PastGame_NegFrame_Trust = summary(
+    data$PastGame_NegFrame_Trust
+  ),
+  PersTrait_NegFrame_Trust = summary(
+    data$PersTrait_NegFrame_Trust
+  ),
+  Promise_NegFrame_Trust = summary(
+    data$Promise_NegFrame_Trust
+  )
+)
+wilcox.test(
+  data$PastGame_PosFrame_Trust,
+  data$PastGame_NegFrame_Trust,
+  paired = FALSE
+)
+wilcox.test(
+  data$PersTrait_PosFrame_Trust,
+  data$PersTrait_NegFrame_Trust,
+  paired = FALSE
+)
+wilcox.test(
+  data$Promise_PosFrame_Trust,
+  data$Promise_NegFrame_Trust,
+  paired = FALSE
+)
+
+# Correlation Tests
+cor.test(
+  data$
+)
 
 # Use Trust
 

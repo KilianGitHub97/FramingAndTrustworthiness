@@ -218,4 +218,27 @@ SummaryFriedman
 PosthocFriedman
 ```
 
+### Is there a relationship between Trust and the Perceived usefulness?
+
+It is assumed, that the there is a relationship between the trust items and the usefulness items. When an information type is perceived useful for a person, it will also be perceived trustworthy. 
+No significant differences can be found between positive and negative frames of the trust items (except for the personality trait item, which is due to poor item formulation). Therefore it is not necessary to test the two conditions separately. The test of choice was a correlation test. Spearman method was used, since data is ordinal scaled. Results can be found below:
+
+**Past Game**
+
+```{r echo=FALSE}
+CorPastGame
+```
+
+**Personality trait**
+
+```{r echo=FALSE}
+CorPersTrait
+```
+
+**Promise**
+
+```{r echo=FALSE}
+CorPromise
+```
+
 

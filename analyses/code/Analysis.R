@@ -548,92 +548,36 @@ wilcox.test(
   paired = FALSE
 )
 
-# Correlation Tests
-cor.test(
-  data$
+data$PastGame_Trust <- rowSums(
+  data[,c("PastGame_PosFrame_Trust",
+          "PastGame_NegFrame_Trust")],
+  na.rm = TRUE
+)
+data$PersTrait_Trust <- rowSums(
+  data[,c("PersTrait_PosFrame_Trust",
+          "PersTrait_NegFrame_Trust")],
+  na.rm = TRUE
+)
+data$Promise_Trust <- rowSums(
+  data[,c("Promise_PosFrame_Trust",
+          "Promise_NegFrame_Trust")],
+  na.rm = TRUE
 )
 
-# Use Trust
+# Correlation Tests
+CorPastGame <- cor.test(
+  data$PastGame_Trust,
+  data$UsefulPastBehav,
+  method = "spearman"
+)
+CorPersTrait <- cor.test(
+  data$PersTrait_Trust,
+  data$UsefulPersTrait,
+  method = "spearman"
+)
+CorPromise <- cor.test(
+  data$Promise_Trust,
+  data$UsefulPersMess,
+  method = "spearman"
+)
 
-#Table for positive Frame
-Tab.Pos.Frame <- AddedValuesFull %>%
-  filter(id == "Positive Frame")
-
-#Table for negative Frame
-Tab.Neg.Frame <- AddedValuesFull %>%
-  filter(id == "Negative Frame")
-
-#cor.test for positive frame
-PosPastGameCor <- tidy(cor.test(Tab.Pos.Frame$PastGame1_PosFrameConf, Tab.Pos.Frame$UsefulPastBehav))
-PosPersTraitCor <- tidy(cor.test(x =Tab.Pos.Frame$PersTrait1_PosFrameConf, y =Tab.Pos.Frame$UsefulPersTrait))
-PosPromiseCor <- tidy(cor.test(x =Tab.Pos.Frame$Promise1_PosFrameConf, y =Tab.Pos.Frame$UsefulPersMess))
-
-#cor.test for negative frame
-NegPastGameCor <- tidy(cor.test(x =Tab.Neg.Frame$PastGame1_NegFrameConf, y =Tab.Neg.Frame$UsefulPastBehav))
-NegPersTraitCor <- tidy(cor.test(x =Tab.Neg.Frame$PersTrait1_NegFrameConf, y =Tab.Neg.Frame$UsefulPersTrait))
-NegPromiseCor <- tidy(cor.test(x =Tab.Neg.Frame$Promise1_NegFrameConf, y =Tab.Neg.Frame$UsefulPersMess))
-
-#put them into a data.frame
-corTestInfo <- data.frame(rbind(PosPastGameCor,PosPersTraitCor,PosPromiseCor, NegPastGameCor, NegPersTraitCor, NegPromiseCor), 
-                          cbind(information_type = c("Past behavior in trustgame", #add a new column
-                                                     "Information on personality trait",
-                                                     "Promise",
-                                                     "Past behavior in trustgame", 
-                                                     "Information on personality trait",
-                                                     "Promise"
-                          )),
-                          cbind(condition = c("Positive", #add a new column
-                                              "Positive", 
-                                              "Positive", 
-                                              "Negative", 
-                                              "Negative", 
-                                              "Negative")))%>%
-  rename(correlation = "estimate")%>%
-  rename(t.value = "statistic")%>%
-  select(-method)%>%
-  select(-alternative)%>%
-  select(-parameter)
-
-#reorder columns by names
-col_order <- c("information_type",
-               "condition", 
-               "correlation",
-               "p.value", 
-               "t.value", 
-               "conf.low", 
-               "conf.high")
-corTestInfo <- corTestInfo[, col_order] 
-
-formattable(corTestInfo)
-
-#Visualised Correlations
-VisCorelOutput <- function(data, x, y){
-  ggplot(data = data,
-         mapping = aes(
-           x = x,
-           y = y
-         )) +
-    geom_point()+
-    geom_smooth(method = lm)
-}
-
-#Correlation Graphs for Positive Frame
-VisCorelOutput.1 <- VisCorelOutput(data = Tab.Pos.Frame, x = Tab.Pos.Frame$PastGame1_PosFrameConf, y =Tab.Pos.Frame$UsefulPastBehav)
-VisCorelOutput.2 <- VisCorelOutput(data = Tab.Pos.Frame, x = Tab.Pos.Frame$PersTrait1_PosFrameConf, y = Tab.Pos.Frame$UsefulPersTrait)
-VisCorelOutput.3 <- VisCorelOutput(data = Tab.Pos.Frame, x = Tab.Pos.Frame$Promise1_PosFrameConf, y = Tab.Pos.Frame$UsefulPersMess)
-
-#Correlation Graphs for Positive Frame
-VisCorelOutput.4 <- VisCorelOutput(data = Tab.Neg.Frame, x = Tab.Neg.Frame$PastGame1_NegFrameConf, y =Tab.Neg.Frame$UsefulPastBehav)
-VisCorelOutput.5 <- VisCorelOutput(data = Tab.Neg.Frame, x = Tab.Neg.Frame$PersTrait1_NegFrameConf, y = Tab.Neg.Frame$UsefulPersTrait)
-VisCorelOutput.6 <- VisCorelOutput(data = Tab.Neg.Frame, x = Tab.Neg.Frame$Promise1_NegFrameConf, y = Tab.Neg.Frame$UsefulPersMess)
-
-#Put all the graphs together
-CorelGraphic <- ggarrange( VisCorelOutput.1, 
-                           VisCorelOutput.2,
-                           VisCorelOutput.3,
-                           VisCorelOutput.4,
-                           VisCorelOutput.5,
-                           VisCorelOutput.6,
-                           labels = c("A", "B", "C", "D", "E", "F"),
-                           ncol = 3, 
-                           nrow = 2 )

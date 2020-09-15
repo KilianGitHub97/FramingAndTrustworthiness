@@ -1,4 +1,4 @@
-# (Title) Impact of information framing on trustworthiness
+# Title: Impact of information framing on trustworthiness
 
 ### Dates
 Data collection began on January 10. 2020 and ended on January 16. 2020 via Qualtrix.

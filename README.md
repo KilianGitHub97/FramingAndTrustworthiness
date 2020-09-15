@@ -1,26 +1,7 @@
-# project-template
-This is the EP lab folder template, please delete this line.
-- **Fill in the below information**
-- **Use NA if the information is not yet available**
-- **All fields are mandatory**
-
-# (Title) A test of the diffusion model explanation for the worst performance rule using preregistration and blinding
-
-### Contributing Authors
-Dutilh, Gilles, Rieskamp, Joerg
+# Title: Impact of information framing on trustworthiness
 
 ### Dates
-Data collection began in March 2018 and ended in May 2018. Paper published in May 2019.
+Data collection began on January 10. 2020 and ended on January 16. 2020 via Qualtrix.
 
 ### Abstract
-People with higher IQ scores also tend to perform better on elementary cognitive-perceptual tasks, such as deciding quickly whether an arrow points to the left or the right. The worst performance rule (WPR) finesses this relation by stating that the association between IQ and elementary-task performance is most pronounced when this performance is summarized by people’s slowest responses.
-
-### Publication
-Bayes et al. (2018). My cool project. Psychological Science, 18(2), 100-125.
-
-### Funding
-SNF grant #12345
-
-### Notes
-The same data were used in Bayes et al. (2017). Other cool project.
-
+When it comes to social interactions and behaviour, especially in financial situations, trustworthiness cannot be thought away. It is known from previous research that trustworthiness can be signalled in different ways and information types, through personality traits, by observation or by simple promises. It is therefore of interest whether trustworthiness too is vulnerable to the framing effect, which is the resulting difference in information perception by manipulation of the way it is formulated. This experiment investigated the impact of framing of social information on the perceived trustworthiness while also trying to detect differences in the type of information given. Using a mixed measure design, we formulated different statements containing different information from fictional people and let the participants rate the perceived trustworthiness. The statements were available in two conditions, one framed positively, the other negatively. The trustworthiness was operationalized through a behavioural and a selfreported measure that the participants answered through a simplified version of the trust game. Framing effects were not observed across all types of information. Information on relevant behavior in the past and information on personality, were perceived more useful than a simple promise. 

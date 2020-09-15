@@ -1,5 +1,5 @@
 ---
-title: "Impact of Information Framing on Trustworthiness"
+title: "Impact of information framing on trustworthiness"
 author: "Kilian Sennrich"
 date: "7 9 2020"
 output:
@@ -9,10 +9,7 @@ output:
     toc_float: true
 ---
 ```{r include=FALSE}
-#source("Analysis.R")
-library(data.table)
-library(tidyverse)
-data <- readRDS("..//..//data//processed//FramingAndTrust_clean.rds")
+source("Analysis.R")
 ```
 
 # Exploration
@@ -173,7 +170,12 @@ Correlation matrix for positive frame:
 
 ```{r echo=FALSE}
 CorMatPos
-QgraphPos
+qgraph(
+  CorMatPos,
+  graph = "pcor",
+  layout = "spring",
+  label.prop = 2
+)
 ```
 
 Item description:
@@ -185,7 +187,11 @@ Correlation matrix for negative frame:
 
 ```{r echo=FALSE}
 CorMatNeg
-QgraphNeg
+qgraph(
+  CorMatNeg,
+  graph = "pcor",
+  layout = "spring",
+  label.prop = 2)
 ```
 
 Item description:
@@ -218,7 +224,7 @@ SummaryFriedman
 PosthocFriedman
 ```
 
-### Is there a relationship between Trust and the Perceived usefulness?
+### Is there a relationship between Trust and the perceived usefulness?
 
 It is assumed, that the there is a relationship between the trust items and the usefulness items. When an information type is perceived useful for a person, it will also be perceived trustworthy. 
 No significant differences can be found between positive and negative frames of the trust items (except for the personality trait item, which is due to poor item formulation). Therefore it is not necessary to test the two conditions separately. The test of choice was a correlation test. Spearman method was used, since data is ordinal scaled. Results can be found below:

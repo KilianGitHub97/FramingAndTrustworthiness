@@ -1,14 +1,3 @@
-# Libraries ---------------------------------------------------------------
-
-library(MASS)
-library(effsize)
-library(stats)
-library(broom)
-library(afex)
-library(rstatix)
-library(egg)
-library(DescTools)
-
 # Import ------------------------------------------------------------------
 
 #setwd
